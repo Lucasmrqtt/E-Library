@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Text, TextInput, TouchableOpacity, Image, View, StyleSheet, ImageBackground, Alert, ToastAndroid, KeyboardAvoidingView} from "react-native";
+import { Text, TextInput, TouchableOpacity, Image, View, StyleSheet, ImageBackground, Alert, ToastAndroid, KeyboardAvoidingView } from "react-native";
 import *as Permissions from "expo-permissions"
 import { BarCodeScanner } from "expo-barcode-scanner";
 import db from "../config";
@@ -10,7 +10,7 @@ const bgImage = require("../assets/background2.png");
 const appIcon = require("../assets/appIcon.png");
 const appName = require("../assets/appName.png");
 
-export default class Transaction extends Component{
+export default class Transaction extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -55,26 +55,32 @@ export default class Transaction extends Component{
     }
   };
 
-  handleTransaction = async() => {
-    var {bookId,studentId} = this.state
+  handleTransaction = async () => {
+    var { bookId, studentId } = this.state
     await this.getStudentDetails(studentId)
     await this.getBookDetails(bookId)
-    db.collection('books')
-      .doc(bookId)
-      .get()
-      .then(doc=>{
-        var book = doc.data()
-        var {bookName,studentName}  = this.state
-        if (book.is_book_available) {
-          this.initiateBookIssue(bookId, studentId, bookName, studentName)
-          //Alert.alert("livro retirado com sucesso")
-          ToastAndroid.show("livro retirado com sucesso",ToastAndroid.SHORT)
-        }else{
-          this.initiateBookReturn(bookId, studentId, bookName, studentName)
-          //Alert.alert("Livro devolvido com sucesso")
-          ToastAndroid.show("Livro devolvido com sucesso",ToastAndroid.SHORT)
-        }
-      })
+    var transactionType = await this.checkBookAvailability(bookId)
+    var { bookName, studentName } = this.state
+
+    if (!transactionType) {
+      this.setState({bookId:"",studentId:""})
+      //Alert.alert("Esse livro não existe :(")
+      ToastAndroid.show("Esse livro não existe :(", ToastAndroid.SHORT)
+    } else if (transactionType == "issue") {
+      var isEligibility = await this.checkStudentEligibilityForBookIssue(studentId)
+      if (isEligibility) {
+        this.initiateBookIssue(bookId, studentId, bookName, studentName)
+      //Alert.alert("livro retirado com sucesso")
+      ToastAndroid.show("livro retirado com sucesso", ToastAndroid.SHORT)
+      }
+    } else if (transactionType == "return") {
+      var isEligibility = await this.checkStudentEligibilityForBookReturn(bookId,studentId)
+      if (isEligibility) {
+        this.initiateBookReturn(bookId, studentId, bookName, studentName)
+      //Alert.alert("Livro devolvido com sucesso")
+      ToastAndroid.show("Livro devolvido com sucesso", ToastAndroid.SHORT)
+      }
+    }
   }
 
   initiateBookIssue = async (bookId, studentId, bookName, studentName) => {
@@ -140,11 +146,11 @@ export default class Transaction extends Component{
   getBookDetails = (bookId) => {
     bookId = bookId.trim().toLowerCase()
     db.collection("books")
-      .where("book_id","==",bookId)
+      .where("book_id", "==", bookId)
       .get()
-      .then(snapshot=> {
-        snapshot.docs.map(doc=>{
-          this.setState({bookName:doc.data().book_name})
+      .then(snapshot => {
+        snapshot.docs.map(doc => {
+          this.setState({ bookName: doc.data().book_name })
         })
       })
   }
@@ -152,14 +158,89 @@ export default class Transaction extends Component{
   getStudentDetails = (studentId) => {
     studentId = studentId.trim().toLowerCase()
     db.collection("students")
-      .where("students_id","==",studentId)
+      .where("students_id", "==", studentId)
       .get()
-      .then(snapshot=> {
-        snapshot.docs.map(doc=>{
-          this.setState({studentdName:doc.data().student_name})
+      .then(snapshot => {
+        snapshot.docs.map(doc => {
+          this.setState({ studentdName: doc.data().student_name })
         })
       })
   }
+
+  checkBookAvailability = async bookId => {
+    const bookRef = await db
+      .collection("books")
+      .where("book_id", "==", bookId)
+      .get();
+
+    var transactionType = "";
+    if (bookRef.docs.length == 0) {
+      transactionType = false;
+    } else {
+      bookRef.docs.map(doc => {
+        //se o livro estiver disponível, o tipo de transação será issue (entregar)
+        // caso contrário, será return (devolver)
+        transactionType = doc.data().is_book_available ? "issue" : "return";
+      });
+    }
+
+    return transactionType;
+  };
+
+  checkStudentEligibilityForBookIssue = async studentId => {
+    const studentRef = await db
+      .collection("students")
+      .where("students_id", "==", studentId)
+      .get();
+
+    var isStudentEligible = "";
+    if (studentRef.docs.length == 0) {
+      this.setState({
+        bookId: "",
+        studentId: ""
+      });
+      isStudentEligible = false;
+      Alert.alert("O id do aluno não existe no banco de dados!");
+    } else {
+      studentRef.docs.map(doc => {
+        if (doc.data().number_of_books_issued < 2) {
+          isStudentEligible = true;
+        } else {
+          isStudentEligible = false;
+          Alert.alert("O aluno já retirou 2 livros!");
+          this.setState({
+            bookId: "",
+            studentId: ""
+          });
+        }
+      });
+    }
+
+    return isStudentEligible;
+  };
+
+  checkStudentEligibilityForBookReturn = async (bookId, studentId) => {
+    const transactionRef = await db
+      .collection("transactions")
+      .where("book_id", "==", bookId)
+      .limit(1)
+      .get();
+    var isStudentEligible = "";
+    transactionRef.docs.map(doc => {
+      var lastBookTransaction = doc.data();
+      if (lastBookTransaction.students_id === studentId) {
+        isStudentEligible = true;
+      } else {
+        isStudentEligible = false;
+        Alert.alert("O livro não foi retirado por este aluno!");
+        this.setState({
+          bookId: "",
+          studentId: ""
+        });
+      }
+    });
+    return isStudentEligible;
+  };
 
   render() {
     const { bookId, studentId, domState, scanned } = this.state;
@@ -185,7 +266,7 @@ export default class Transaction extends Component{
                 placeholder={"ID do Livro"}
                 placeholderTextColor={"#FFFFFF"}
                 value={bookId}
-                onChangeText={text => this.setState({bookId:text})}
+                onChangeText={text => this.setState({ bookId: text })}
               />
               <TouchableOpacity
                 style={styles.scanbutton}
@@ -200,7 +281,7 @@ export default class Transaction extends Component{
                 placeholder={"ID do Estudante"}
                 placeholderTextColor={"#FFFFFF"}
                 value={studentId}
-                onChangeText={text => this.setState({studentId:text})}
+                onChangeText={text => this.setState({ studentId: text })}
               />
               <TouchableOpacity
                 style={styles.scanbutton}
