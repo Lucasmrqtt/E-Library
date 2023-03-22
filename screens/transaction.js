@@ -17,7 +17,7 @@ export default class Transaction extends Component {
       bookId: "",
       bookName: "",
       studentId: "",
-      studentdName: "",
+      studentName: "",
       domState: "normal",
       hasCameraPermissions: null,
       scanned: false
@@ -63,22 +63,22 @@ export default class Transaction extends Component {
     var { bookName, studentName } = this.state
 
     if (!transactionType) {
-      this.setState({bookId:"",studentId:""})
+      this.setState({ bookId: "", studentId: "" })
       //Alert.alert("Esse livro não existe :(")
       ToastAndroid.show("Esse livro não existe :(", ToastAndroid.SHORT)
     } else if (transactionType == "issue") {
       var isEligibility = await this.checkStudentEligibilityForBookIssue(studentId)
       if (isEligibility) {
         this.initiateBookIssue(bookId, studentId, bookName, studentName)
-      //Alert.alert("livro retirado com sucesso")
-      ToastAndroid.show("livro retirado com sucesso", ToastAndroid.SHORT)
+        //Alert.alert("livro retirado com sucesso")
+        ToastAndroid.show("livro retirado com sucesso", ToastAndroid.SHORT)
       }
     } else if (transactionType == "return") {
-      var isEligibility = await this.checkStudentEligibilityForBookReturn(bookId,studentId)
+      var isEligibility = await this.checkStudentEligibilityForBookReturn(bookId, studentId)
       if (isEligibility) {
         this.initiateBookReturn(bookId, studentId, bookName, studentName)
-      //Alert.alert("Livro devolvido com sucesso")
-      ToastAndroid.show("Livro devolvido com sucesso", ToastAndroid.SHORT)
+        //Alert.alert("Livro devolvido com sucesso")
+        ToastAndroid.show("Livro devolvido com sucesso", ToastAndroid.SHORT)
       }
     }
   }
@@ -162,7 +162,7 @@ export default class Transaction extends Component {
       .get()
       .then(snapshot => {
         snapshot.docs.map(doc => {
-          this.setState({ studentdName: doc.data().student_name })
+          this.setState({ studentName: doc.data().student_name })
         })
       })
   }

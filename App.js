@@ -4,29 +4,29 @@ import *as Font from "expo-font"
 import TabNavigator from './components/tabNavigator';
 
 export default class App extends Component {
-  constructor(){
+  constructor() {
     super()
-    this.state = {fontLoaded:false}
+    this.state = { fontLoaded: false }
   }
 
-  async loadFonts(){
+  async loadFonts() {
     await Font.loadAsync({
-      Rajdhani_600SemiBold:Rajdhani_600SemiBold
+      Rajdhani_600SemiBold: Rajdhani_600SemiBold
     })
     this.setState({
-      fontLoaded:true
+      fontLoaded: true
     })
   }
 
-  componentDidMount(){
+  componentDidMount() {
     this.loadFonts()
   }
-  
-  render(){
-    const {fontLoaded} = this.state
+
+  render() {
+    const { fontLoaded } = this.state
     if (fontLoaded) {
-      return (   
-          <TabNavigator/>
+      return (
+        <TabNavigator />
       );
     }
     return null

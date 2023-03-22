@@ -7,13 +7,13 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { NavigationContainer } from "@react-navigation/native";
 
 
-const Tab = createBottomTabNavigator() 
+const Tab = createBottomTabNavigator()
 
-export default class TabNavigator extends Component{
-  render(){
-    return(
+export default class TabNavigator extends Component {
+  render() {
+    return (
       <NavigationContainer>
-        <Tab.Navigator 
+        <Tab.Navigator
           screenOptions={({ route }) => ({
             tabBarIcon: ({ focused, color, size }) => {
               let iconName;

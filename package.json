@@ -10,16 +10,16 @@
   },
   "dependencies": {
     "@expo-google-fonts/rajdhani": "^0.2.3",
-    "@react-native-async-storage/async-storage": "^1.17.12",
+    "@react-native-async-storage/async-storage": "^1.17.3",
     "@react-native-community/masked-view": "^0.1.11",
     "@react-navigation/bottom-tabs": "^6.5.7",
     "@react-navigation/native": "^6.1.6",
-    "expo": "~48.0.5",
-    "expo-barcode-scanner": "~12.3.2",
+    "expo": "^47.0.0",
+    "expo-barcode-scanner": "12.1.0",
     "expo-font": "~11.1.1",
     "expo-permissions": "~14.1.1",
     "expo-status-bar": "~1.4.4",
-    "firebase": "8.2.10",
+    "firebase": "^8.10.1",
     "react": "18.2.0",
     "react-native": "0.71.3",
     "react-native-gesture-handler": "^2.9.0",
@@ -29,7 +29,7 @@
     "react-native-vector-icons": "^9.2.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.19.3"
   },
   "private": true
 }
