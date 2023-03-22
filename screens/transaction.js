@@ -17,7 +17,7 @@ export default class Transaction extends Component {
       bookId: "",
       bookName: "",
       studentId: "",
-      studentdName: "",
+      studentName: "",
       domState: "normal",
       hasCameraPermissions: null,
       scanned: false
@@ -162,7 +162,7 @@ export default class Transaction extends Component {
       .get()
       .then(snapshot => {
         snapshot.docs.map(doc => {
-          this.setState({ studentdName: doc.data().student_name })
+          this.setState({ studentName: doc.data().student_name })
         })
       })
   }
