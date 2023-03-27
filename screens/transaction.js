@@ -5,7 +5,6 @@ import { BarCodeScanner } from "expo-barcode-scanner";
 import db from "../config";
 import firebase from "firebase"
 
-
 const bgImage = require("../assets/background2.png");
 const appIcon = require("../assets/appIcon.png");
 const appName = require("../assets/appName.png");
@@ -22,7 +21,7 @@ export default class Transaction extends Component {
       hasCameraPermissions: null,
       scanned: false
     };
-  }
+  };
 
   getCameraPermissions = async domState => {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
@@ -81,7 +80,7 @@ export default class Transaction extends Component {
         ToastAndroid.show("Livro devolvido com sucesso", ToastAndroid.SHORT)
       }
     }
-  }
+  };
 
   initiateBookIssue = async (bookId, studentId, bookName, studentName) => {
     //adicionar uma transação
@@ -153,7 +152,7 @@ export default class Transaction extends Component {
           this.setState({ bookName: doc.data().book_name })
         })
       })
-  }
+  };
 
   getStudentDetails = (studentId) => {
     studentId = studentId.trim().toLowerCase()
@@ -165,7 +164,7 @@ export default class Transaction extends Component {
           this.setState({ studentName: doc.data().student_name })
         })
       })
-  }
+  };
 
   checkBookAvailability = async bookId => {
     const bookRef = await db
@@ -299,7 +298,7 @@ export default class Transaction extends Component {
         </ImageBackground>
       </View>
     );
-  }
+  };
 }
 
 const styles = StyleSheet.create({

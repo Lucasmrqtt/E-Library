@@ -6,7 +6,6 @@ import Transaction from "../screens/transaction";
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { NavigationContainer } from "@react-navigation/native";
 
-
 const Tab = createBottomTabNavigator()
 
 export default class TabNavigator extends Component {
